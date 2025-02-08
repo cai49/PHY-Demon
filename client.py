@@ -72,6 +72,35 @@ WALK_SOUTH: int = 2
 WALK_WEST:  int = 3
 
 # A random walk is very inefficient
+def remote_control_walk() -> list[int]:
+    x_position = position[0]
+    y_position = position[1]
+
+    data = c.recv(1024)
+    if data:
+        value = data.decode()
+
+        if value == "N":
+            y_position = y_position - 1
+            print("Moving North")
+        elif value == "S":
+            y_position = y_position + 1
+            print("Moving South")
+        elif value == "E":
+            x_position = x_position + 1
+            print("Moving East")
+        elif value == "W":
+            x_position = x_position - 1
+            print("Moving West")
+        elif value == "Q":
+            print("Quitting...")
+            pygame.quit()
+        else:
+            print(f"Received: {value}")
+
+    _move_direction = [x_position, y_position]
+    return _move_direction
+
 def random_walk(cylindrical_space:bool=False) -> list[int]:
     direction = np.random.choice([
         WALK_NORTH,
@@ -236,29 +265,7 @@ while running:
             case 2: # AGENT_MOVE
                 debug_log("AGENT_MOVE")
 
-                move_direction = [0,0]
-                waiting_for_input = True
-                if waiting_for_input:
-                    data = c.recv(1024)
-                    if data:
-                        value = data.decode()
-
-                        waiting_for_input = False
-
-                        if value == "N":
-                            move_direction = [position[0],position[1]-1]
-                            print("Moving North")
-                        elif value == "S":
-                            move_direction = [position[0],position[1]+1]
-                            print("Moving South")
-                        elif value == "E":
-                            move_direction = [position[0]+1,position[1]]
-                            print("Moving East")
-                        elif value == "W":
-                            move_direction = [position[0]-1,position[1]]
-                            print("Moving West")
-                        else:
-                            print(f"Received: {value}")
+                move_direction = remote_control_walk()
 
                 position = [move_direction[0], move_direction[1]]
                 AGENT_STATE = AGENT_THINK
