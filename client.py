@@ -6,7 +6,6 @@ import pygame
 pygame.init()
 
 #region Client Stuff
-#host = "192.168.1.88"
 host = ''
 port = 9090
 
